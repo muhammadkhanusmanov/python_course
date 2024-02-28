@@ -12,7 +12,11 @@ from rest_framework.authentication import TokenAuthentication, BasicAuthenticati
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-class UserView(APIView):
+
+
+
+class Signup(APIView):
+    
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
@@ -51,33 +55,27 @@ class UserView(APIView):
                 token = Token.objects.create(user=user)
                 return Response({'Status':'created','Token':token.key},status=status.HTTP_201_CREATED)
         return Response({'Status':'BAD_REQUEST'},status=status.HTTP_400_BAD_REQUEST)
+    
+
 class Signin(APIView):
     authentication_classes = [BasicAuthentication]
-    @swagger_auto_schema(request_body=openapi.Schema(
+    @swagger_auto_schema(
+    request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        properties={
-            'username': openapi.Schema(type=openapi.TYPE_STRING),
-            'password': openapi.Schema(type=openapi.TYPE_STRING),
-        },
         required=['username', 'password'],
+        properties={
+            'username': openapi.Schema(type=openapi.TYPE_STRING, description='Username by Basic Authentication'),
+            'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password by Basic Authentication'),
+        }
     ),
     responses={
-            status.HTTP_200_OK: openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'Status': openapi.Schema(type=openapi.TYPE_STRING),
-                    'Token': openapi.Schema(type=openapi.TYPE_STRING),
-                }),
-            status.HTTP_404_NOT_FOUND: openapi.Schema(
-                type=openapi.TYPE_OBJECT,
-                properties={
-                    'Status': openapi.Schema(type=openapi.TYPE_STRING),
-                    'Token': openapi.Schema(type=openapi.TYPE_STRING, nullable=True),
-                })
-            },
+        200: openapi.Schema(type=openapi.TYPE_STRING),
+        401: openapi.Schema(type=openapi.TYPE_STRING),
+    },
+    operation_description="Get information about the authenticated user.",
     security=[{"basic": []}],  # Specify Basic Authentication
-    operation_description="For login, request username and password, response status and user's token.",
     )
+
     
     def post(self,request):
         user = request.user
@@ -86,3 +84,30 @@ class Signin(APIView):
             return Response({'Status': 'OK','Token': token.key},status=status.HTTP_200_OK)
         except:
             return Response({'Status': 'User not found', 'Token':None},status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class Logout(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    @swagger_auto_schema(
+        request_body=None,
+        responses={
+            200: openapi.Schema(type=openapi.TYPE_BOOLEAN),
+            400: openapi.Schema(type=openapi.TYPE_BOOLEAN),
+        },
+        operation_description="Send a token to delete the user's token",
+        security=[{"token": []}], 
+        manual_parameters=[
+        openapi.Parameter('Authorization', in_=openapi.IN_HEADER, type=openapi.TYPE_STRING, description='Token 633ae0c6603495498d6f121ed984645dd1223135')
+        ],
+    )
+
+    def delete(self, request):
+        user = request.user
+        try:
+            token = Token.objects.get(user=user)
+            token.delete()
+            return Response({'status':True},status=status.HTTP_204_OK)
+        except:
+            return Response({'status':False},status=status.HTTP_400_BAD_REQUEST)
