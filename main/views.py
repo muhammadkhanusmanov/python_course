@@ -12,8 +12,9 @@ from rest_framework.authentication import TokenAuthentication, BasicAuthenticati
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+from .serializers import LessonSerializer
 
-
+from .models import Lesson
 
 class Signup(APIView):
     
@@ -111,3 +112,54 @@ class Logout(APIView):
             return Response({'status':True},status=status.HTTP_204_OK)
         except:
             return Response({'status':False},status=status.HTTP_400_BAD_REQUEST)
+
+class CreatLesson(APIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAdminUser]
+    # parser_classes = (MultiPartParser, FormParser)
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'name': openapi.Schema(type=openapi.TYPE_STRING),
+            'url': openapi.Schema(type=openapi.TYPE_STRING),
+            'file': openapi.Schema(type=openapi.TYPE_FILE),
+        },
+        required=['name', 'url','file'],
+    ),
+        responses={
+            201: openapi.Schema(type=openapi.TYPE_BOOLEAN),
+            400: openapi.Schema(type=openapi.TYPE_BOOLEAN),
+        },
+        operation_description="send properties for creating a new lesson",
+        security=[{"token": []}], 
+        manual_parameters=[
+        openapi.Parameter('Authorization', in_=openapi.IN_HEADER, type=openapi.TYPE_STRING, description='Token 633ae0c6603495498d6f121ed984645dd1223135')
+        ],
+    )
+
+    def post(self, request):
+        data = request.data
+        try:
+            file = file = request.FILES.get('file')
+
+            lesson = Lesson.objects.create(
+                name = data['name'],
+                url = data['url'],
+                file = file
+            )
+            lesson.save()
+
+            return Response({'Status':'Created'},status=status.HTTP_201_CREATED)
+        except:
+             return Response({'Status':'Bad Request'},status=status.HTTP_400_BAD_REQUEST)
+        
+class SaveFile(APIView):
+    def get(self, request, id: str):
+        try:
+            file = Lesson.objects.get(id=id)
+            file = file.file
+            rs = open(file.path,'rb')
+            return FileResponse(rs)
+        except:
+            return Response({'status': False},status=status.HTTP_400_BAD_REQUEST)
