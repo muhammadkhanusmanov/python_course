@@ -173,6 +173,6 @@ class GetLessons(APIView):
         lns = []
         for lesson in lessons:
             lesson = LessonSerializer(lesson).data
-            lesson['file'] = f'http://127.0.0.1:8000/v2/save_task/{lesson['id']}'
+            lesson['file'] = f"http://127.0.0.1:8000/v2/save_task/{lesson['id']}"
             lns.append(lesson)
         return Response(lns)
