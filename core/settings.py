@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ho(uqay7acjwa*9b9t!8tr@*9rc1tzjif4f8&qhnexgz@dsnw-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'main',
     'rest_framework.authtoken',
-    'drf_yasg'
+    'drf_yasg',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -83,6 +85,8 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 
 # Password validation
