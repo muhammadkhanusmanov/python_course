@@ -165,8 +165,8 @@ class SaveFile(APIView):
             return Response({'status': False},status=status.HTTP_400_BAD_REQUEST)
         
 class GetLessons(APIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdminUser]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
 
     def post(self, request):
         lessons = Lesson.objects.all()
