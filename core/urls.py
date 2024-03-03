@@ -10,7 +10,7 @@ schema_view = get_schema_view(
         title="Your API",
         default_version='v1',
         description="Your API description",
-        terms_of_service="https://www.yourapp.com/terms/",
+        terms_of_service="https://pycourse.pythonanywhere.com/",
         contact=openapi.Contact(email="contact@yourapp.com"),
         license=openapi.License(name="Your License"),
     ),

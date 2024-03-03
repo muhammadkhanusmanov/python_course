@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'main',
     'rest_framework.authtoken',
+    'rest_framework_swagger',
+    'rest_framework_simplejwt',
+    'django_extensions',
     'drf_yasg',
     'corsheaders',
 ]
