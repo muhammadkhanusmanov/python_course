@@ -114,8 +114,8 @@ class Logout(APIView):
             return Response({'status':False},status=status.HTTP_400_BAD_REQUEST)
 
 class CreatLesson(APIView):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAdminUser]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
     # parser_classes = (MultiPartParser, FormParser)
     @swagger_auto_schema(
         request_body=openapi.Schema(
@@ -163,3 +163,16 @@ class SaveFile(APIView):
             return FileResponse(rs)
         except:
             return Response({'status': False},status=status.HTTP_400_BAD_REQUEST)
+        
+class GetLessons(APIView):
+    # authentication_classes = [TokenAuthentication]
+    # permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        lessons = Lesson.objects.all()
+        lns = []
+        for lesson in lessons:
+            lesson = LessonSerializer(lesson).data
+            lesson['file'] = f'http://127.0.0.1:8000/v2/save_task/{lesson['id']}'
+            lns.append(lesson)
+        return Response(lns)
