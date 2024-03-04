@@ -111,13 +111,14 @@ class Logout(APIView):
         try:
             token = Token.objects.get(user=user)
             token.delete()
-            return Response({'status':True},status=status.HTTP_204_OK)
+            return Response({'status':True},status=status.HTTP_200_OK)
         except:
             return Response({'status':False},status=status.HTTP_400_BAD_REQUEST)
     
 
 class GetUsers(APIView):
     authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAdminUser]
     def get(self, request):
         users = User.objects.all()
         urs = []
@@ -201,3 +202,22 @@ class GetLessons(APIView):
             return Response(lesson)
         except:
             return Response({'status':'Bad Request'},status=status.HTTP_400_BAD_REQUEST)
+
+class CompletedView(APIView):
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request):
+        usr = request.user
+        lsn = request.data['lesson']
+        try:
+            cmpt = Completed.objects.get(user=usr)
+            cmpt.lessons.add(lsn)
+            cmpt.save()
+            return Response({'status':True},status=status.HTTP_200_OK)
+        except:
+            cmpt = Completed.objects.create(
+                user = usr,
+                lessons = lsn
+            )
+            cmpt.save()
+            return Response({'status':True},status=status.HTTP_200_OK)
