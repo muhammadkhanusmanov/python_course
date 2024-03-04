@@ -173,6 +173,15 @@ class GetLessons(APIView):
         lns = []
         for lesson in lessons:
             lesson = LessonSerializer(lesson).data
-            lesson['file'] = f"http://127.0.0.1:8000/v2/save_task/{lesson['id']}"
+            lesson['file'] = f"https://pycourse.pythonanywhere.com/v2/save_file/{lesson['id']}"
             lns.append(lesson)
         return Response(lns)
+    
+    def get(self,request, id:str):
+        try:
+            lesson = Lesson.objects.get(id=id)
+            lesson = LessonSerializer(lesson).data
+            lesson['file'] = f"https://pycourse.pythonanywhere.com/v2/save_file/{lesson['id']}"
+            return Response(lesson)
+        except:
+            return Response({'status':'Bad Request'},status=status.HTTP_400_BAD_REQUEST)
