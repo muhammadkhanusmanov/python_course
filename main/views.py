@@ -82,7 +82,7 @@ class Signin(APIView):
         user = request.user
         try:
             token,created = Token.objects.get_or_create(user = user)
-            if user.IsAdminUser():
+            if user.is_superuser:
                 return Response({'Status': 'Admin','Token': token.key},status=status.HTTP_200_OK)
             return Response({'Status': 'OK','Token': token.key},status=status.HTTP_200_OK)
         except:
