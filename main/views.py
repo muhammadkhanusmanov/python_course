@@ -82,6 +82,8 @@ class Signin(APIView):
         user = request.user
         try:
             token,created = Token.objects.get_or_create(user = user)
+            if user.IsAdminUser():
+                return Response({'Status': 'Admin','Token': token.key},status=status.HTTP_200_OK)
             return Response({'Status': 'OK','Token': token.key},status=status.HTTP_200_OK)
         except:
             return Response({'Status': 'User not found', 'Token':None},status=status.HTTP_404_NOT_FOUND)
