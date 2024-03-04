@@ -14,7 +14,7 @@ from drf_yasg import openapi
 
 from .serializers import LessonSerializer
 
-from .models import Lesson
+from .models import Lesson, Completed
 
 class Signup(APIView):
     
@@ -114,6 +114,20 @@ class Logout(APIView):
             return Response({'status':True},status=status.HTTP_204_OK)
         except:
             return Response({'status':False},status=status.HTTP_400_BAD_REQUEST)
+    
+
+class GetUsers(APIView):
+    authentication_classes = [TokenAuthentication]
+    def get(self, request):
+        users = User.objects.all()
+        urs = []
+        for user in users:
+            ur = {
+                'username':user.username,
+                'first_name':user.get('first_name','Noname')
+            }
+            urs.append(ur)
+        return Response(urs)
 
 class CreatLesson(APIView):
     authentication_classes = [TokenAuthentication]
@@ -168,7 +182,7 @@ class SaveFile(APIView):
         
 class GetLessons(APIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAdminUser]
+    # permission_classes = [IsAdminUser]
 
     def post(self, request):
         lessons = Lesson.objects.all()
