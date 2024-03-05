@@ -12,7 +12,7 @@ from rest_framework.authentication import TokenAuthentication, BasicAuthenticati
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .serializers import LessonSerializer
+from .serializers import LessonSerializer,ComleteSerializer
 
 from .models import Lesson, Completed
 
@@ -182,7 +182,7 @@ class SaveFile(APIView):
             return Response({'status': False},status=status.HTTP_400_BAD_REQUEST)
         
 class GetLessons(APIView):
-    authentication_classes = [TokenAuthentication]
+    # authentication_classes = [TokenAuthentication]
     # permission_classes = [IsAdminUser]
 
     def post(self, request):
@@ -207,17 +207,22 @@ class CompletedView(APIView):
     authentication_classes = [TokenAuthentication]
 
     def post(self, request):
-        usr = request.user
-        lsn = request.data['lesson']
+        user_instance = request.user
+        lesson_id = request.data.get('lesson')
+
         try:
-            cmpt = Completed.objects.get(user=usr)
-            cmpt.lessons.add(lsn)
-            cmpt.save()
-            return Response({'status':True},status=status.HTTP_200_OK)
-        except:
-            cmpt = Completed.objects.create(
-                user = usr,
-                lessons = lsn
-            )
-            cmpt.save()
-            return Response({'status':True},status=status.HTTP_200_OK)
+            completed_instance = Completed.objects.get(user=user_instance)
+            lesson_instance = Lesson.objects.get(id=lesson_id)
+            completed_instance.lessons.add(lesson_instance)
+            completed_instance.save()
+            return Response({'status': True}, status=status.HTTP_200_OK)
+        except Completed.DoesNotExist:
+            # Agar Completed obyekti mavjud emas bo'lsa
+            completed_instance = Completed.objects.create(user=user_instance)
+            lesson_instance = Lesson.objects.get(id=lesson_id)
+            completed_instance.lessons.add(lesson_instance)
+            return Response({'status': True}, status=status.HTTP_200_OK)
+    def get(self,request):
+        cmpts=Completed.objects.all()
+        srl = ComleteSerializer(cmpts,many=True)
+        return Response(srl.data)
