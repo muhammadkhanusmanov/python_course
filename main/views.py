@@ -12,7 +12,7 @@ from rest_framework.authentication import TokenAuthentication, BasicAuthenticati
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
-from .serializers import LessonSerializer,ComleteSerializer
+from .serializers import LessonSerializer,ComleteSerializer,UserSerializer
 
 from .models import Lesson, Completed
 
@@ -121,14 +121,8 @@ class GetUsers(APIView):
     permission_classes = [IsAdminUser]
     def get(self, request):
         users = User.objects.all()
-        urs = []
-        for user in users:
-            ur = {
-                'username':user.username,
-                'first_name':user.get('first_name','Noname')
-            }
-            urs.append(ur)
-        return Response(urs)
+        usr = UserSerializer(users,many=True).data
+        return Response(usr)
 
 class CreatLesson(APIView):
     authentication_classes = [TokenAuthentication]
