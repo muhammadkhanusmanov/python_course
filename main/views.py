@@ -220,3 +220,11 @@ class CompletedView(APIView):
         cmpts=Completed.objects.all()
         srl = ComleteSerializer(cmpts,many=True)
         return Response(srl.data)
+    
+class CopUser(APIView):
+    authentication_classes = [TokenAuthentication]
+    def post(self,request):
+        user = request.user
+        cpt = Completed.objects.get(user=user)
+        cpt = ComleteSerializer(cpt).data
+        return Response(cpt,status=status.HTTP_200_OK)
