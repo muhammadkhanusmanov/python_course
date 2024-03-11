@@ -1,5 +1,7 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, ReadOnlyField
 from .models import Lesson,Completed
+from django.contrib.auth.models import User
+
 
 class LessonSerializer(ModelSerializer):
     class Meta:
@@ -14,7 +16,13 @@ class LessonSerializer(ModelSerializer):
 
 class ComleteSerializer(ModelSerializer):
     lessons = LessonSerializer(many=True)
-    username = ReadOnlyField(source='user.username')
     class Meta:
         model = Completed
-        fields = ['id', 'user', 'username','lessons']
+        fields = ['id', 'user','lessons']
+        
+
+class UserSerializer(ModelSerializer):
+    completed = ComleteSerializer(many=True)
+    class Meta:
+        model = User
+        fields = ['id','username', 'first_name','completed']
